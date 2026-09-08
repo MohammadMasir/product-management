@@ -21,8 +21,8 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "cart", nullable = false)
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User users;
 
     @CreationTimestamp

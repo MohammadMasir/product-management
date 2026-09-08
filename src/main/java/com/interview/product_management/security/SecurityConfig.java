@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/v1/api/auth", "/v1/api/auth/**"))
                 .formLogin(formPage -> formPage.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .build();

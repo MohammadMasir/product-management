@@ -25,13 +25,13 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "item_count", nullable = false, columnDefinition = "INTEGER check (itemCount > 0)")
+    @Column(name = "item_count", nullable = false, columnDefinition = "INTEGER check (item_count > 0)")
     private Integer itemCount;
 
-    @Column(name = "total_quantity", nullable = false, columnDefinition = "INTEGER check (totalQuantity > 0)")
+    @Column(name = "total_quantity", nullable = false, columnDefinition = "INTEGER check (total_quantity > 0)")
     private Integer totalQuantity;
 
-    @Column(name = "total_amount", nullable = false, columnDefinition = "NUMERIC(10, 2) check (totalAmount > 0)")
+    @Column(name = "total_amount", nullable = false, columnDefinition = "NUMERIC(10, 2) check (total_amount > 0)")
     private BigDecimal totalAmount;
 
     @Column(name = "payment_mode", nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'NONE'")

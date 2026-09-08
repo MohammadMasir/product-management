@@ -26,11 +26,11 @@ public class CartItems {
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart", nullable = false)
+    @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
-
-    @Column(nullable = false, columnDefinition = "INTEGER check (quantity > 0)") // While "@PreUpdate"ing we'll check if during deduction the quantity is <= 0 then we'll remove the entire row.
-    private Integer quantity;
+//
+//    @Column(nullable = false, columnDefinition = "INTEGER check (quantity > 0)") // While "@PreUpdate"ing we'll check if during deduction the quantity is <= 0 then we'll remove the entire row.
+//    private Integer quantity;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

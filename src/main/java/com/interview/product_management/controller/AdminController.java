@@ -1,15 +1,13 @@
 package com.interview.product_management.controller;
 
 import com.interview.product_management.dto.product.ProductDto;
+import com.interview.product_management.enums.product.ProductStatus;
 import com.interview.product_management.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -18,12 +16,22 @@ public class AdminController {
 
     private final ProductService productService;
 
-    @GetMapping("/add-product")
+    @PostMapping("/product/add")
     public ResponseEntity<Void> addProduct(@Valid @RequestBody ProductDto productDto) {
-        productService.addProduct(productDto);
+        productService.add(productDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/product/{id}")
+    public ResponseEntity<Void> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
+        productService.update(id, productDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
+    @PutMapping("/product/{id}/editStatus")
+    public ResponseEntity<Void> editProductStatus(@PathVariable Long id, ProductStatus productStatus) {
+        productService.editProductStatus(id, productStatus);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

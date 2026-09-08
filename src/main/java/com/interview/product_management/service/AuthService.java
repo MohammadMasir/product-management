@@ -3,6 +3,7 @@ package com.interview.product_management.service;
 import com.interview.product_management.dto.auth.LoginDto;
 import com.interview.product_management.dto.auth.RegisterDto;
 import com.interview.product_management.enums.Role;
+import com.interview.product_management.model.Cart;
 import com.interview.product_management.model.User;
 import com.interview.product_management.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,7 +54,11 @@ public class AuthService {
             user.setEmail(registerDto.email());
             user.setPassword(passwordEncoder.encode(registerDto.password()));
             user.setRole(Role.USER);
+            Cart cart = new Cart();
+            user.setCart(cart);
+            cart.setUsers(user);
             userRepository.save(user);
+            return;
         }
         throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
