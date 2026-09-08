@@ -9,6 +9,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter @Setter
@@ -21,9 +23,12 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User users;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.REMOVE)
+    private List<CartItems> cartItems = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -1,6 +1,7 @@
 package com.interview.product_management.dto.product;
 
 import com.interview.product_management.enums.product.ProductStatus;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,6 +15,7 @@ public record ProductDto(
         String name,
 
         @NotNull(message = "Price cannot be null!")
+        @Digits(integer = 10, fraction = 2, message = "Price cannot have more than 2 decimal and value cannot be more than 10 digit integer")
         BigDecimal price,
 
         @NotNull(message = "Quantity cannot be null")

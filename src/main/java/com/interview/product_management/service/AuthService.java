@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -57,6 +58,22 @@ public class AuthService {
             Cart cart = new Cart();
             user.setCart(cart);
             cart.setUsers(user);
+            userRepository.save(user);
+            return;
+        }
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Passwords do not match!"
+        );
+    }
+
+    @Transactional
+    public void signup(RegisterDto registerDto, Role role) {
+        if (registerDto.passwordsMatch()) {
+            User user = new User();
+            user.setEmail(registerDto.email());
+            user.setPassword(passwordEncoder.encode(registerDto.password()));
+            user.setRole(role);
             userRepository.save(user);
             return;
         }

@@ -1,8 +1,13 @@
 package com.interview.product_management.controller;
 
+import com.interview.product_management.dto.product.CartDto;
 import com.interview.product_management.dto.product.CartItemsDto;
 import com.interview.product_management.dto.product.OrderDetailsDto;
+import com.interview.product_management.dto.product.OrderDto;
+import com.interview.product_management.enums.orders.PaymentMode;
+import com.interview.product_management.enums.orders.PaymentStatus;
 import com.interview.product_management.service.CartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +23,8 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<CartItemsDto>> getCartItems(@PathVariable("id") Long cartId) {
-        List<CartItemsDto> cartItems = cartService.getCartItems(cartId);
+    public ResponseEntity<CartDto> getCartItems(@PathVariable("id") Long cartId) {
+        CartDto cartItems = cartService.getCartItems(cartId);
         return new ResponseEntity<>(cartItems, HttpStatus.OK);
     }
 
@@ -36,8 +41,8 @@ public class CartController {
     }
 
     @GetMapping("/checkout")
-    public ResponseEntity<OrderDetailsDto> checkout(Long cartId) {
-        OrderDetailsDto orderDetails = cartService.checkout(cartId);
+    public ResponseEntity<OrderDetailsDto> checkout(@Valid @RequestBody OrderDto orderDto) {
+        OrderDetailsDto orderDetails = cartService.checkout(orderDto);
         return  new ResponseEntity<>(orderDetails, HttpStatus.OK);
     }
 

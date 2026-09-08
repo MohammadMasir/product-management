@@ -11,6 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter @Setter
@@ -26,7 +28,7 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, scale = 2, precision = 10)
     private BigDecimal price;
 
     @Column(nullable = false, columnDefinition = "INTEGER check (quantity > 0)")
@@ -35,6 +37,9 @@ public class Product {
     @Column(nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'DISABLE'")
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<CartItems> cartItems = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

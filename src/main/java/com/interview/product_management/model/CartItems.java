@@ -28,9 +28,9 @@ public class CartItems {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
-//
-//    @Column(nullable = false, columnDefinition = "INTEGER check (quantity > 0)") // While "@PreUpdate"ing we'll check if during deduction the quantity is <= 0 then we'll remove the entire row.
-//    private Integer quantity;
+
+    @Column(nullable = false, columnDefinition = "INTEGER check (quantity > 0)") // While "@PreUpdate"ing we'll check if during deduction the quantity is <= 0 then we'll remove the entire row.
+    private Integer quantity;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -38,6 +38,9 @@ public class CartItems {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // TODO : write the @PreUpdate for cart-item quantity updation..
+    // TODO : write the @PrePersist for cart-item on quantity on each insertion..
+
+
+    // TODO : write the @PreUpdate for cart-item on quantity on each quantity update for deduction until we remove the entire row when quantity = 0..
 
 }

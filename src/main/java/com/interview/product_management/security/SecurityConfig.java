@@ -25,13 +25,14 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger-ui/**", "/swagger-ui/index.html", "/v3/api-docs/**").permitAll()
                                 .requestMatchers("/v1/api/auth","/v1/api/auth/**").permitAll()
                                 .requestMatchers("/v1/api/product","/v1/api/product/**").permitAll()
-                                .requestMatchers("/v1/api/admin", "/v1/api/admin/**" ).hasRole("ADMIN")
+                                .requestMatchers("/v1/api/admin/signup", "/v1/api/admin/login").permitAll()
+                                .requestMatchers("/v1/api/admin/", "/v1/api/admin/product/", "/v1/api/admin/product/**" ).hasAuthority("ADMIN")
                                 .anyRequest().authenticated()
                         )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/v1/api/auth", "/v1/api/auth/**"))
+                .csrf(csrf -> csrf.disable())
                 .formLogin(formPage -> formPage.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .build();
