@@ -68,8 +68,7 @@ public class CartService {
 
     @Transactional
     public OrderDetailsDto checkout(OrderDto orderDto) {
-        orderService.createOrder(orderDto);
-        return null;
+        return orderService.createOrder(orderDto);
     }
 
 }

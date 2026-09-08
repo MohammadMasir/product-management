@@ -40,7 +40,7 @@ public class CartController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/checkout")
+    @PostMapping("/checkout")
     public ResponseEntity<OrderDetailsDto> checkout(@Valid @RequestBody OrderDto orderDto) {
         OrderDetailsDto orderDetails = cartService.checkout(orderDto);
         return  new ResponseEntity<>(orderDetails, HttpStatus.OK);
