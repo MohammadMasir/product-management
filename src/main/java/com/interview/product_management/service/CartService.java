@@ -32,13 +32,19 @@ public class CartService {
     private final ProductRepository productRepository;
     private final OrderService orderService;
     private final UserRepository userRepository;
+    private final ProductService productService;
 
     @Transactional
-    public void addItemToCart(CartItemsDto cartItem, User user) {
+    public void addItemToCart(Long productId, User user) {
         CartItems cartItems = new CartItems();
         Cart cart = cartRepository.findByUsers_Id(user.getId());
+        if (cart == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Cart not found!"
+            );
+        }
         cartItems.setCart(cart);
-        cartItems.setProduct(productRepository.getReferenceById(cartItem.productId()));
+        cartItems.setProduct(productService.getActiveProductById(productId));
         cartItemsRepository.save(cartItems);
     }
 
@@ -106,6 +112,17 @@ public class CartService {
         OrderDetailsDto orderDetails = orderService.createOrder(orderDto, user1, cart.getId(), totalAmount);
         clearCart(user1);
         return orderDetails;
+    }
+
+    @Transactional
+    public void deleteCartItemByProductId(Long productId, User user) {
+        Cart cart = cartRepository.findByUsers_Id(user.getId());
+        if (cart == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Cart not found"
+            );
+        }
+        cartItemsRepository.deleteByProduct_Id(productId);
     }
 
     @Transactional

@@ -45,9 +45,9 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/product/{id}")
-    public ResponseEntity<Void> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDto productDto) {
-        productService.update(id, productDto);
+    @PutMapping("/product/update")
+    public ResponseEntity<Void> updateProduct(@Valid @RequestBody ProductDto productDto) {
+        productService.update(productDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

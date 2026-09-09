@@ -51,6 +51,9 @@ public class AuthService {
     @Transactional
     public void signup(RegisterDto registerDto) {
         if (registerDto.passwordsMatch()) {
+            if (userRepository.findByEmail(registerDto.email()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            }
             User user = new User();
             user.setEmail(registerDto.email());
             user.setPassword(passwordEncoder.encode(registerDto.password()));
@@ -70,6 +73,9 @@ public class AuthService {
     @Transactional
     public void signup(RegisterDto registerDto, Role role) {
         if (registerDto.passwordsMatch()) {
+            if (userRepository.findByEmail(registerDto.email()).isPresent()) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+            }
             User user = new User();
             user.setEmail(registerDto.email());
             user.setPassword(passwordEncoder.encode(registerDto.password()));

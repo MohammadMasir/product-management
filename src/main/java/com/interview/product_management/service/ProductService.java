@@ -26,7 +26,7 @@ public class ProductService {
         return productRepository.findAllActiveProducts();
     }
 
-    private Product getActiveProductById(Long id){
+    public Product getActiveProductById(Long id){
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         if (product.getProductStatus().equals(ProductStatus.DISABLE)){
             throw new ResponseStatusException(
@@ -71,8 +71,8 @@ public class ProductService {
     }
 
     @Transactional
-    public void update(Long id, ProductDto productDto) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    public void update(ProductDto productDto) {
+        Product product = productRepository.findById(productDto.id()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         product.setName(productDto.name());
         product.setPrice(productDto.price());
         product.setQuantity(productDto.quantity());

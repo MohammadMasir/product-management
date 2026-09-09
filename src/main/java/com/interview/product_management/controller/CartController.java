@@ -28,12 +28,12 @@ public class CartController {
         return new ResponseEntity<>(cartItems, HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/{id}")
     public ResponseEntity<Void> addToCart(
-            @Valid @RequestBody CartItemsDto cartItems,
+            @PathVariable("id") Long productId,
             @AuthenticationPrincipal User user
             ) {
-        cartService.addItemToCart(cartItems, user);
+        cartService.addItemToCart(productId, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -43,6 +43,14 @@ public class CartController {
             @AuthenticationPrincipal User user
     ) {
         cartService.updateCartQuantity(cartItems, user);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removeCartItemByProductId(
+            @PathVariable("id") Long productId,
+            @AuthenticationPrincipal User user){
+        cartService.deleteCartItemByProductId(productId, user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
