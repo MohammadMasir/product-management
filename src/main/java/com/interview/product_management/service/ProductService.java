@@ -2,43 +2,48 @@ package com.interview.product_management.service;
 
 import com.interview.product_management.dto.product.ProductDto;
 import com.interview.product_management.enums.product.ProductStatus;
+import com.interview.product_management.exceptions.InsufficientQuantityException;
+import com.interview.product_management.exceptions.OutOfStockException;
 import com.interview.product_management.exceptions.ResourceNotFoundException;
 import com.interview.product_management.model.Product;
 import com.interview.product_management.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
 
     public List<ProductDto> getAll() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(product -> new ProductDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getQuantity(),
-                        product.getProductStatus()
-                )).toList();
+        return productRepository.findAllActiveProducts();
+    }
+
+    private Product getActiveProductById(Long id){
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        if (product.getProductStatus().equals(ProductStatus.DISABLE)){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "No such Product!"
+            );
+        }
+        return product;
     }
 
     public ProductDto getById(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Product product = getActiveProductById(id);
         return new ProductDto(
                 product.getId(),
                 product.getName(),
                 product.getPrice(),
-                product.getQuantity(),
-                product.getProductStatus()
+                product.getQuantity()
         );
     }
 
@@ -54,7 +59,13 @@ public class ProductService {
 
     @Transactional
     public void buyProduct(Long id, int quantity) {
-        Product product = productRepository.getReferenceById(id);
+        Product product = getActiveProductById(id);
+        if (product.getQuantity() < quantity && product.getQuantity() != 0) {
+            throw new InsufficientQuantityException("Insufficient quantity, Only "+product.getQuantity()+" remaining.");
+        }
+        else if (product.getQuantity() == 0){
+            throw new OutOfStockException("Product '"+product.getName()+"' is Out-of-Stock!");
+        }
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
     }

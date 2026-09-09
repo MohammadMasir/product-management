@@ -31,12 +31,12 @@ public class Product {
     @Column(nullable = false, scale = 2, precision = 10)
     private BigDecimal price;
 
-    @Column(nullable = false, columnDefinition = "INTEGER check (quantity > 0)")
+    @Column(nullable = false, columnDefinition = "INTEGER check (quantity >= 0)")
     private Integer quantity;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'DISABLE'")
+    @Column(name = "product_status", nullable = false, columnDefinition = "VARCHAR(50) DEFAULT 'DISABLE'")
     @Enumerated(EnumType.STRING)
-    private ProductStatus productStatus;
+    private ProductStatus productStatus = ProductStatus.DISABLE;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<CartItems> cartItems = new ArrayList<>();
@@ -48,5 +48,6 @@ public class Product {
     private LocalDateTime updatedAt;
 
     // TODO : write the Product quantity updation using @PreUpdate
+
 
 }

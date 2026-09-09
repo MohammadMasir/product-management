@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CartItemsRepository extends JpaRepository<CartItems, Long> {
@@ -18,8 +19,13 @@ public interface CartItemsRepository extends JpaRepository<CartItems, Long> {
 
     @Query(value = "SELECT p.price,ci.quantity FROM cart_items AS ci" +
             " JOIN products AS p " +
-            "ON ci.cart_item=p.id WHERE ci.cart = :cart ",  nativeQuery = true)
-    List<PriceQuantityProjection> getPriceQuantityByCart(@Param("cart") Cart cart);
+            "ON ci.cart_item=p.id WHERE ci.cart_id = :cart_id ", nativeQuery = true)
+    List<PriceQuantityProjection> getPriceQuantityByCartId(@Param("cart_id") Long cartId);
 
-    CartItems findCartItemsByCartAndProduct(Cart cart, Product product);
+    Optional<CartItems> findCartItemsByCartAndProduct(Cart cart, Product product);
+
+    @EntityGraph(attributePaths = {"cart_id"})
+    List<CartItems> findAllByCart_Id(Long cartId);
+
+    void deleteAllByCart(Cart cart);
 }

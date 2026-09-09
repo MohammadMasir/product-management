@@ -1,11 +1,12 @@
 package com.interview.product_management.service;
 
 import com.interview.product_management.dto.product.CartItemsDto;
+import com.interview.product_management.dto.product.CartProductDetailsDto;
 import com.interview.product_management.dto.product.OrderDetailsDto;
 import com.interview.product_management.dto.product.OrderDto;
 import com.interview.product_management.exceptions.ResourceNotFoundException;
-import com.interview.product_management.model.Order;
-import com.interview.product_management.model.OrderItems;
+import com.interview.product_management.model.*;
+import com.interview.product_management.repository.CartItemsRepository;
 import com.interview.product_management.repository.OrderItemsRepository;
 import com.interview.product_management.repository.OrderRepository;
 import com.interview.product_management.repository.ProductRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,43 +26,62 @@ public class OrderService {
     private final ProductService productService;
     private final OrderItemsRepository orderItemsRepository;
     private final ProductRepository productRepository;
+    private final CartItemsRepository cartItemsRepository;
 
     @Transactional
-    public OrderDetailsDto createOrder(OrderDto orderDto) {
+    public OrderDetailsDto createOrder(OrderDto orderDto, User user, Long cartId, BigDecimal totalAmount) {
         Order order = new Order();
-        order.setItemCount(orderDto.cartDto().cartItems().size());
+
+        order.setUsers(user);
+
         order.setPaymentMode(orderDto.paymentMode());
         order.setPaymentStatus(orderDto.paymentStatus());
         order.setDeliveryStatus(orderDto.deliveryStatus());
-        List<CartItemsDto> cartItems = orderDto.cartDto().cartItems();
+
+        List<CartItems> cartItems = cartItemsRepository.findAllByCart_Id(cartId);
+        order.setItemCount(cartItems.size());
         int totalQuantity = 0;
-        for (CartItemsDto cartItem : cartItems) {
-            totalQuantity = totalQuantity + cartItem.quantity();
+        for (CartItems cartItem : cartItems) {
+            totalQuantity = totalQuantity + cartItem.getQuantity();
         }
         order.setTotalQuantity(totalQuantity);
-        order.setTotalAmount(orderDto.cartDto().totalAmount());
+        order.setTotalAmount(totalAmount);
+
         Order order1 = orderRepository.save(order);
-        addOrderItems(order1.getId(), cartItems);
+
+        addOrderItems(order1.getId(), cartId);
+
+        List<CartProductDetailsDto> cartProductDetailsDtoList = cartItemsRepository.findAllByCart_Id(cartId).stream()
+                .map(cartItems1 -> new CartProductDetailsDto(
+                        cartItems1.getProduct().getName(),
+                        cartItems1.getQuantity()
+                )).toList();
+
         return new OrderDetailsDto(
                 order1.getId(),
+                cartProductDetailsDtoList,
                 order1.getItemCount(),
-                orderDto.cartDto().totalAmount(),
+                totalAmount,
                 orderDto.paymentMode(),
                 orderDto.deliveryStatus(),
                 orderDto.paymentStatus()
         );
     }
 
-    public void addOrderItems(Long orderId, List<CartItemsDto> cartItems){
-        List<Long> productIdList = cartItems.stream().map(CartItemsDto::productId).toList();
-        for (Long productId : productIdList) {
+    @Transactional
+    public void addOrderItems(Long orderId, Long cartId) {
+        List<CartItems> cartItems = cartItemsRepository.findAllByCart_Id(cartId);
+        List<Product> products = cartItems.stream().map(CartItems::getProduct).toList();
+
+        for (Product product : products) {
             OrderItems orderItems = new OrderItems();
             orderItems.setOrders(orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order NOT Found!")));
-            orderItems.setProduct(productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product NOT Found!")));
+            orderItems.setProduct(product);
             orderItemsRepository.save(orderItems);
         }
-        for (CartItemsDto cartItem : cartItems) {
-            productService.buyProduct(cartItem.productId(), cartItem.quantity());
+
+        for (CartItems cartItem : cartItems) {
+            productService.buyProduct(cartItem.getProduct().getId(), cartItem.getQuantity());
         }
     }
 }
